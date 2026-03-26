@@ -303,6 +303,7 @@ Singleton {
                                     "unfocusedIconsOpacity": 1.0,
                                     "groupedBorderOpacity": 1.0,
                                     "enableScrollWheel": true,
+                                    "reverseScroll": false,
                                     "iconScale": 0.8,
                                     "focusedColor": "primary",
                                     "occupiedColor": "secondary",

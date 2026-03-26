@@ -223,6 +223,7 @@
       "unfocusedIconsOpacity": 1,
       "groupedBorderOpacity": 1,
       "enableScrollWheel": true,
+      "reverseScroll": false,
       "iconScale": 0.8,
       "focusedColor": "primary",
       "occupiedColor": "secondary",
