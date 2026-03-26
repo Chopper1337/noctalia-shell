@@ -47,7 +47,10 @@ PanelWindow {
   readonly property real barHeight: Style.getBarHeightForScreen(barWindow.screen?.name)
 
   // Auto-hide properties
-  readonly property bool autoHide: Settings.getBarDisplayModeForScreen(barWindow.screen?.name) === "auto_hide"
+  readonly property bool autoHide: {
+    const mode = Settings.getBarDisplayModeForScreen(barWindow.screen?.name);
+    return mode === "auto_hide" || mode === "auto_hide_blocking";
+  }
   readonly property int hideDelay: Settings.data.bar.autoHideDelay || 500
   readonly property int showDelay: Settings.data.bar.autoShowDelay || 100
   property bool isHidden: autoHide
@@ -135,9 +138,16 @@ PanelWindow {
       // Show bar when auto-hide is disabled
       hideTimer.stop();
       showTimer.stop();
-      barWindow.isHidden = false;
+      BarService.setScreenHidden(barWindow.screen?.name, false);
+    } else {
+      // Just entered auto-hide mode — hide immediately and initialize BarService state.
+      // BarService.onDisplayModeChanged may not fire barAutoHideStateChanged if
+      // screenAutoHideState hasn't been initialized yet for this screen (e.g. first
+      // time switching from always_visible), leaving barPlaceholder.isHidden stale.
+      hideTimer.stop();
+      showTimer.stop();
+      BarService.setScreenHidden(barWindow.screen?.name, true);
     }
-    // When auto-hide is enabled, don't immediately hide - wait for mouse to leave
   }
 
   // Anchor to the bar's edge

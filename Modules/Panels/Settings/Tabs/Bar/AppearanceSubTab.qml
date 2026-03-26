@@ -109,6 +109,10 @@ ColumnLayout {
       {
         "key": "auto_hide",
         "name": I18n.tr("hide-modes.auto-hide")
+      },
+      {
+        "key": "auto_hide_blocking",
+        "name": I18n.tr("hide-modes.auto-hide-blocking")
       }
     ]
     currentKey: Settings.data.bar.displayMode
@@ -331,11 +335,11 @@ ColumnLayout {
   NDivider {
     Layout.fillWidth: true
     Layout.topMargin: Style.marginS
-    visible: Settings.data.bar.displayMode === "auto_hide"
+    visible: Settings.data.bar.displayMode === "auto_hide" || Settings.data.bar.displayMode === "auto_hide_blocking"
   }
 
   ColumnLayout {
-    visible: Settings.data.bar.displayMode === "auto_hide"
+    visible: Settings.data.bar.displayMode === "auto_hide" || Settings.data.bar.displayMode === "auto_hide_blocking"
     spacing: Style.marginS
     Layout.fillWidth: true
 

@@ -589,6 +589,7 @@
   },
   "hide-modes": {
     "auto-hide": "Auto-hide",
+    "auto-hide-blocking": "Auto-hide (blocking)",
     "hidden": "Hide when empty",
     "idle": "Hide when idle",
     "non-exclusive": "Non-exclusive",

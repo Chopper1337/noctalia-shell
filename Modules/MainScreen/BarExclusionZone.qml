@@ -20,6 +20,13 @@ PanelWindow {
 
   readonly property bool autoHide: Settings.getBarDisplayModeForScreen(screen?.name) === "auto_hide"
   readonly property bool nonExclusive: Settings.getBarDisplayModeForScreen(screen?.name) === "non_exclusive"
+  readonly property bool autoHideBlocking: Settings.getBarDisplayModeForScreen(screen?.name) === "auto_hide_blocking"
+  // For auto_hide_blocking: reactive read of current hidden state.
+  // BarService.screenAutoHideState is reassigned on every change, keeping this binding live.
+  readonly property bool blockingBarHidden: {
+    var state = BarService.screenAutoHideState[screen?.name];
+    return state ? state.hidden : true; // default hidden until first interaction
+  }
   readonly property bool barFloating: Settings.data.bar.barType === "floating"
   readonly property real barMarginH: (barFloating && edge === Settings.getBarPositionForScreen(screen?.name)) ? Math.ceil(Settings.data.bar.marginHorizontal) : 0
   readonly property real barMarginV: (barFloating && edge === Settings.getBarPositionForScreen(screen?.name)) ? Math.ceil(Settings.data.bar.marginVertical) : 0
@@ -43,7 +50,13 @@ PanelWindow {
   // Note: We check BarService.isVisible directly, NOT effectivelyVisible, because we want
   // the exclusion zone to stay during overview (effectivelyVisible is false during overview
   // when hideOnOverview is enabled, but isVisible remains true)
-  WlrLayershell.exclusionMode: (autoHide || nonExclusive || !BarService.isVisible) ? ExclusionMode.Ignore : ExclusionMode.Auto
+  WlrLayershell.exclusionMode: {
+    if (!BarService.isVisible || nonExclusive || autoHide)
+      return ExclusionMode.Ignore;
+    if (autoHideBlocking)
+      return blockingBarHidden ? ExclusionMode.Ignore : ExclusionMode.Auto;
+    return ExclusionMode.Auto;
+  }
 
   // Anchor based on specified edge
   anchors {

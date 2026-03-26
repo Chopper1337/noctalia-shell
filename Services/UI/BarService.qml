@@ -43,12 +43,18 @@ Singleton {
   // Auto-hide state per screen: { screenName: { hovered: bool, hidden: bool } }
   property var screenAutoHideState: ({})
 
+  // Returns true for any auto-hiding display mode
+  function isAutoHideMode(screenName) {
+    const mode = Settings.getBarDisplayModeForScreen(screenName);
+    return mode === "auto_hide" || mode === "auto_hide_blocking";
+  }
+
   // Get or create auto-hide state for a screen
   function getOrCreateAutoHideState(screenName) {
     if (!screenAutoHideState[screenName]) {
       screenAutoHideState[screenName] = {
         "hovered": false,
-        "hidden": Settings.getBarDisplayModeForScreen(screenName) === "auto_hide"
+        "hidden": isAutoHideMode(screenName)
       };
     }
     return screenAutoHideState[screenName];
@@ -94,7 +100,7 @@ Singleton {
     var anyAutoHideVisible = false;
     var hasAutoHideScreens = false;
     for (var screenName in screenAutoHideState) {
-      if (Settings.getBarDisplayModeForScreen(screenName) === "auto_hide") {
+      if (isAutoHideMode(screenName)) {
         hasAutoHideScreens = true;
         if (!screenAutoHideState[screenName].hidden) {
           anyAutoHideVisible = true;
@@ -106,7 +112,7 @@ Singleton {
     // Toggle auto-hide screens (per-screen hidden state only)
     if (hasAutoHideScreens) {
       for (var screenName in screenAutoHideState) {
-        if (Settings.getBarDisplayModeForScreen(screenName) === "auto_hide") {
+        if (isAutoHideMode(screenName)) {
           setScreenHidden(screenName, anyAutoHideVisible);
         }
       }
@@ -124,7 +130,7 @@ Singleton {
   function show() {
     // Show auto-hide screens
     for (var screenName in screenAutoHideState) {
-      if (Settings.getBarDisplayModeForScreen(screenName) === "auto_hide") {
+      if (isAutoHideMode(screenName)) {
         setScreenHidden(screenName, false);
       }
     }
@@ -138,7 +144,7 @@ Singleton {
   function hide() {
     var hasAutoHideScreens = false;
     for (var screenName in screenAutoHideState) {
-      if (Settings.getBarDisplayModeForScreen(screenName) === "auto_hide") {
+      if (isAutoHideMode(screenName)) {
         setScreenHidden(screenName, true);
         hasAutoHideScreens = true;
       }
@@ -155,7 +161,7 @@ Singleton {
   // to start the hide timer.
   function peek() {
     for (var screenName in screenAutoHideState) {
-      if (Settings.getBarDisplayModeForScreen(screenName) === "auto_hide") {
+      if (isAutoHideMode(screenName)) {
         setScreenHidden(screenName, false);
         if (!isBarHovered(screenName)) {
           barHoverStateChanged(screenName, false);
@@ -187,8 +193,7 @@ Singleton {
       // Only affect screens without displayMode overrides
       for (let screenName in screenAutoHideState) {
         if (!Settings.hasScreenOverride(screenName, "displayMode")) {
-          var displayMode = Settings.getBarDisplayModeForScreen(screenName);
-          if (displayMode === "auto_hide") {
+          if (isAutoHideMode(screenName)) {
             setScreenHidden(screenName, true);
           } else {
             if (screenAutoHideState[screenName].hidden) {
@@ -204,8 +209,7 @@ Singleton {
 
       // Re-evaluate auto-hide state for all screens
       for (let screenName in screenAutoHideState) {
-        var displayMode = Settings.getBarDisplayModeForScreen(screenName);
-        if (displayMode === "auto_hide") {
+        if (isAutoHideMode(screenName)) {
           if (!screenAutoHideState[screenName].hidden) {
             setScreenHidden(screenName, true);
           }
@@ -246,7 +250,8 @@ Singleton {
     function onWorkspaceChanged() {
       if (!Settings.data.bar.showOnWorkspaceSwitch)
         return;
-      if (Settings.data.bar.displayMode !== "auto_hide")
+      const globalMode = Settings.data.bar.displayMode;
+      if (globalMode !== "auto_hide" && globalMode !== "auto_hide_blocking")
         return;
 
       var ws = CompositorService.getCurrentWorkspace();

@@ -59,7 +59,7 @@ Singleton {
       BarService.peek();
     }
     function setDisplayMode(mode: string, screen: string) {
-      if (mode === "always_visible" || mode === "non_exclusive" || mode === "auto_hide") {
+      if (mode === "always_visible" || mode === "non_exclusive" || mode === "auto_hide" || mode === "auto_hide_blocking") {
         if (!screen || screen === "all") {
           Settings.data.bar.displayMode = mode;
         } else {

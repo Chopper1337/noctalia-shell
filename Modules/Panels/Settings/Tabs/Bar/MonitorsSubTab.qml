@@ -215,6 +215,10 @@ ColumnLayout {
                   {
                     "key": "auto_hide",
                     "name": I18n.tr("hide-modes.auto-hide")
+                  },
+                  {
+                    "key": "auto_hide_blocking",
+                    "name": I18n.tr("hide-modes.auto-hide-blocking")
                   }
                 ]
                 currentKey: Settings.getBarDisplayModeForScreen(monitorCard.screenName)

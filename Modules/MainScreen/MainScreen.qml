@@ -445,7 +445,10 @@ PanelWindow {
       readonly property real barHeight: Style.getBarHeightForScreen(screen?.name)
 
       // Auto-hide properties (read by AllBackgrounds for background fade)
-      readonly property bool autoHide: Settings.getBarDisplayModeForScreen(screen?.name) === "auto_hide"
+      readonly property bool autoHide: {
+        const mode = Settings.getBarDisplayModeForScreen(screen?.name);
+        return mode === "auto_hide" || mode === "auto_hide_blocking";
+      }
       property bool isHidden: autoHide
 
       Connections {

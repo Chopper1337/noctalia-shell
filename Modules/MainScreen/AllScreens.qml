@@ -85,7 +85,8 @@ Variants {
           return false;
         if (!BarService.effectivelyVisible)
           return false;
-        if (Settings.getBarDisplayModeForScreen(modelData?.name) !== "auto_hide")
+        const mode = Settings.getBarDisplayModeForScreen(modelData?.name);
+        if (mode !== "auto_hide" && mode !== "auto_hide_blocking")
           return false;
 
         // Check if bar is configured for this screen
