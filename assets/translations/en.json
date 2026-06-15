@@ -1808,7 +1808,7 @@
           "description": "Which screen edge the bar sits on"
         },
         "reserve-space": {
-          "description": "Push windows away from the bar edge"
+          "description": "Push windows away from the bar edge. With auto-hide enabled, the space is reserved only while the bar is revealed and reclaimed while it is hidden"
         },
         "shadow": {
           "description": "Cast the global surface shadow from the bar"

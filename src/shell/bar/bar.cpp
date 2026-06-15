@@ -1951,7 +1951,18 @@ bool Bar::shouldReserveExclusiveZone(const BarInstance& instance) const noexcept
   if (instance.ipcLayoutReleased) {
     return false;
   }
-  return instance.barConfig.reserveSpace;
+  if (!instance.barConfig.reserveSpace) {
+    return false;
+  }
+  // For an auto-hiding bar, release the exclusive zone while it is fully hidden so tiled
+  // windows reclaim the space, and reserve it again the moment the bar reveals. This makes
+  // auto_hide + reserve_space behave like the v4 "auto_hide_blocking" mode (the bar pushes
+  // windows aside when visible and overlaps nothing when hidden). syncBarExclusiveZone() is
+  // driven per-frame by the reveal/hide animations, so the zone tracks hideOpacity live.
+  if (instance.barConfig.autoHide && instance.hideOpacity <= 0.001f) {
+    return false;
+  }
+  return true;
 }
 
 void Bar::syncBarExclusiveZone(BarInstance& instance) {
