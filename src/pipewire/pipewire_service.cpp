@@ -1949,7 +1949,13 @@ void PipeWireService::rebuildState() {
     const NodeData* source = findNode(link.outputNodeId);
     const NodeData* consumer = findNode(link.inputNodeId);
     addLinkedAudioCapture(source);
-    addLinkedAudioCapture(consumer);
+    // Recorders like gpu-screen-recorder (app/app-inverse modes) link application playback
+    // streams straight into their capture node; that is desktop audio, not the microphone.
+    const bool sourceIsPlayback =
+        source != nullptr && (source->mediaClass == "Audio/Sink" || isProgramOutputNode(*source));
+    if (!sourceIsPlayback) {
+      addLinkedAudioCapture(consumer);
+    }
 
     if (source == nullptr || consumer == nullptr) {
       continue;
