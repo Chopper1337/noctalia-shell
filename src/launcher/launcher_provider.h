@@ -39,6 +39,9 @@ struct LauncherResult {
   std::string category;
   std::string presentation;
   std::optional<std::string> query;
+  // Title and subtitle are Pango markup rather than plain text (plugin opt-in);
+  // the provider is responsible for escaping '&', '<' and '>'.
+  bool markup = false;
   double score = 0.0;
   int recentlyUsedIndex = 0; // Higher is more recent. <=0 means no record or too old.
   bool pinned = false;       // Set by LauncherPanel for launcher-owned pinned applications.

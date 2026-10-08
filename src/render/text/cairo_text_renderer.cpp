@@ -77,6 +77,15 @@ namespace {
     }
   }
 
+  // Pango markup that sets its own colors (<span foreground="#..">) needs the RGBA
+  // path: A8 coverage keeps only glyph shapes, so the shader tint would paint every
+  // span in the label's color. Matches foreground=, background=, fgcolor=, bgcolor=,
+  // color=, underline_color= and strikethrough_color=.
+  bool markupSetsColor(std::string_view text) {
+    return text.find("color=") != std::string_view::npos || text.find("foreground=") != std::string_view::npos
+        || text.find("background=") != std::string_view::npos;
+  }
+
   bool containsColorGlyph(PangoLayout* layout) {
     for (GSList* line = pango_layout_get_lines_readonly(layout); line != nullptr; line = line->next) {
       for (GSList* run = static_cast<PangoLayoutLine*>(line->data)->runs; run != nullptr; run = run->next) {
@@ -960,9 +969,10 @@ CairoTextRenderer::CacheEntry* CairoTextRenderer::lookupOrRasterize(
   // Tinted (A8 coverage) entries are color-independent — the shader applies
   // u_tint at draw time, so one cache entry serves every color. RGBA entries
   // (mixed content with COLR emoji) bake non-emoji ink color into the Cairo
-  // surface, so rgb must be part of the key. Alpha is normalized to 1.0 in
-  // the key AND in the rasterized source so opacity animations on mixed
-  // strings still reuse one entry.
+  // surface, so rgb must be part of the key. Markup that sets its own span
+  // colors takes the RGBA path too. Alpha is normalized to 1.0 in the key AND
+  // in the rasterized source so opacity animations on mixed strings still
+  // reuse one entry.
   CacheKey key;
   key.text.assign(text);
   key.font = font;
@@ -988,7 +998,7 @@ CairoTextRenderer::CacheEntry* CairoTextRenderer::lookupOrRasterize(
 
   PangoLayout* layout =
       buildLayout(contentScale, text, fontSize, font, maxWidth * contentScale, maxLines, align, ellipsize, useMarkup);
-  const bool tinted = !containsColorGlyph(layout);
+  const bool tinted = !containsColorGlyph(layout) && !(useMarkup && markupSetsColor(text));
   if (tinted) {
     key.colorRgba = 0U;
   }

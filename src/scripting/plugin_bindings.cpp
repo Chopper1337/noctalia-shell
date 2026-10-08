@@ -306,7 +306,8 @@ namespace {
   // launcher.setResults(query, results) — replaces this provider's result set.
   // `query` echoes the text passed to onQuery so late async results map back to the
   // right query. Each result is a table { id, title, subtitle?, glyph?, icon?,
-  // badge?, category?, presentation?, score?, query? }. `category` matches a label
+  // badge?, category?, presentation?, markup?, score?, query? }. `markup = true` makes
+  // title and subtitle Pango markup (the script escapes its own text). `category` matches a label
   // declared by a [[launcher_provider.category]] manifest entry, letting the
   // launcher's category filter bar narrow this provider's results. A result's
   // optional `query` rewrites the input to this provider's prefix + that sub-query
@@ -338,6 +339,9 @@ namespace {
         result.category = tableOptionalStringField(L, row, "category");
         result.presentation = tableOptionalStringField(L, row, "presentation");
         result.query = tableStringField(L, row, "query");
+        lua_getfield(L, row, "markup");
+        result.markup = lua_toboolean(L, -1) != 0;
+        lua_pop(L, 1);
         lua_getfield(L, row, "score");
         if (lua_isnumber(L, -1)) {
           result.score = lua_tonumber(L, -1);
