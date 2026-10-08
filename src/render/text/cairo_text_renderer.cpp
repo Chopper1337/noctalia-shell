@@ -436,7 +436,10 @@ PangoLayout* CairoTextRenderer::buildLayout(
   constexpr int kHardMaxLines = 500;
   if (maxWidthPxScaled > 0.0F) {
     // Avoid Pango inserting hyphens at intra-word line breaks (looks like stray "-" in wrapped UI text).
-    PangoAttrList* attrs = pango_attr_list_new();
+    // Extend the layout's own list rather than replacing it: set_markup stores the
+    // markup's styling (weight, size, color...) there.
+    PangoAttrList* existing = pango_layout_get_attributes(layout);
+    PangoAttrList* attrs = existing != nullptr ? pango_attr_list_copy(existing) : pango_attr_list_new();
     PangoAttribute* hyphens = pango_attr_insert_hyphens_new(FALSE);
     hyphens->start_index = 0;
     hyphens->end_index = PANGO_ATTR_INDEX_TO_TEXT_END;
