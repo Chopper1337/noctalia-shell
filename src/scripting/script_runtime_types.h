@@ -94,6 +94,7 @@ namespace scripting {
     std::string category;
     std::string presentation;
     std::optional<std::string> query;
+    bool markup = false;
     double score = 0.0;
 
     bool operator==(const ScriptLauncherResult&) const = default;

@@ -217,6 +217,7 @@ void PluginLauncherProvider::handleResult(const scripting::ScriptResult& result)
     lr.category = r.category;
     lr.presentation = r.presentation;
     lr.query = r.query;
+    lr.markup = r.markup;
     lr.score = r.score;
     m_cache.push_back(std::move(lr));
   }

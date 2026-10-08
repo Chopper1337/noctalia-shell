@@ -70,6 +70,15 @@ namespace {
     }
   }
 
+  // Pango markup that sets its own colors (<span foreground="#..">) needs the RGBA
+  // path: A8 coverage keeps only glyph shapes, so the shader tint would paint every
+  // span in the label's color. Matches foreground=, background=, fgcolor=, bgcolor=,
+  // color=, underline_color= and strikethrough_color=.
+  bool markupSetsColor(std::string_view text) {
+    return text.find("color=") != std::string_view::npos || text.find("foreground=") != std::string_view::npos
+        || text.find("background=") != std::string_view::npos;
+  }
+
   // Scan UTF-8 text for codepoints that are likely to resolve to a COLR/bitmap
   // color glyph. We can't ask Pango cheaply whether a shaped run used a color
   // font, so we approximate: if the text contains codepoints in the common
@@ -951,10 +960,11 @@ CairoTextRenderer::CacheEntry* CairoTextRenderer::lookupOrRasterize(
   // Tinted (A8 coverage) entries are color-independent — the shader applies
   // u_tint at draw time, so one cache entry serves every color. RGBA entries
   // (mixed content with COLR emoji) bake non-emoji ink color into the Cairo
-  // surface, so rgb must be part of the key. Alpha is normalized to 1.0 in
-  // the key AND in the rasterized source so opacity animations on mixed
-  // strings still reuse one entry.
-  const bool tinted = !containsColorGlyph(text);
+  // surface, so rgb must be part of the key. Markup that sets its own span
+  // colors takes the RGBA path too. Alpha is normalized to 1.0 in the key AND
+  // in the rasterized source so opacity animations on mixed strings still
+  // reuse one entry.
+  const bool tinted = !containsColorGlyph(text) && !(useMarkup && markupSetsColor(text));
 
   CacheKey key;
   key.text.assign(text);

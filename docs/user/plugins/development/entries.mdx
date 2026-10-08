@@ -334,8 +334,16 @@ before running `onQuery` - set it for network-backed providers so you aren't cal
 
 - `query` **must echo** the `text` from `onQuery`, so late results map back to the query they answer - the latest one
   wins. Calling it with an empty list clears the provider's results.
-- Each result is a table: `{ id, title, subtitle?, glyph?, icon?, badge?, query?, score? }`. `id` is passed back to
-  `onActivate` unless `query` is set. Results are ordered by `score` (descending), then insertion order.
+- Each result is a table: `{ id, title, subtitle?, glyph?, icon?, badge?, category?, presentation?, markup?, query?,
+  score? }`. `id` is passed back to `onActivate` unless `query` is set. Results are ordered by `score` (descending),
+  then insertion order.
+- `presentation = "detail"` shows a lone result as a scrollable text view: `title` becomes the multi-line body and
+  `subtitle` a caption above it. With more than one result it renders as a normal row.
+- `markup = true` treats `title` and `subtitle` as [Pango markup](https://docs.gtk.org/Pango/pango_markup.html)
+  (`<b>`, `<i>`, `<small>`, `<span size=… weight=… alpha=… foreground=…>`). Escape `&`, `<` and `>` in your own
+  text. Rows recolor their text when selected or hovered, so prefer `alpha`, weight and size over fixed
+  `foreground` colors in list rows; fixed colors suit the `detail` view, which has no selection state. Read
+  theme colors with `noctalia.getColor(role)`.
 - `glyph` (a Tabler/Nerd-Font name) or `icon` (a themed icon name) is the row's leading visual. `badge` is a short
   string (e.g. an emoji or `=`) drawn *in place of* the icon - setting it hides `glyph`/`icon`. Use the `subtitle` for
   secondary text.

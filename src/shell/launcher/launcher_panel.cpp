@@ -363,6 +363,7 @@ namespace {
       m_originGlyph->setParticipatesInLayout(hasOrigin);
       const float originWidth = hasOrigin ? Style::fontSizeBody * m_style.scale + gap : 0.0F;
       const float textWidth = std::max(0.0F, width - leadingWidth - pinnedWidth - originWidth - horizontalPad);
+      m_title->setUseMarkup(result.markup);
       m_title->setText(singleLinePreview(result.title));
       m_title->setMaxWidth(textWidth);
 
@@ -372,6 +373,7 @@ namespace {
         m_subtitle->setText("");
       } else {
         m_subtitle->setVisible(true);
+        m_subtitle->setUseMarkup(result.markup);
         m_subtitle->setText(singleLinePreview(result.subtitle));
         m_subtitle->setMaxWidth(textWidth);
       }
@@ -595,6 +597,7 @@ namespace {
 
       const float horizontalPad = Style::spaceSm * m_style.scale * 2.0F;
       const float textWidth = std::max(0.0F, width - horizontalPad);
+      m_title->setUseMarkup(result.markup);
       m_title->setText(singleLinePreview(result.title));
       m_title->setMaxWidth(textWidth);
 
@@ -1986,7 +1989,9 @@ void LauncherPanel::bindDetailResult() {
   const bool hasSubtitle = !result.subtitle.empty();
   m_detailSubtitle->setVisible(hasSubtitle);
   m_detailSubtitle->setParticipatesInLayout(hasSubtitle);
+  m_detailSubtitle->setUseMarkup(result.markup);
   m_detailSubtitle->setText(singleLinePreview(result.subtitle));
+  m_detailBody->setUseMarkup(result.markup && !result.title.empty());
   m_detailBody->setText(result.title.empty() ? result.id : result.title);
   m_detailScroll->setScrollOffset(0.0F);
 }
