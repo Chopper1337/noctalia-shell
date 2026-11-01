@@ -54,5 +54,5 @@ meson compile -C "$BUILD_DIR"
 
 echo ""
 echo "Installing..."
-sudo meson install --no-rebuild -C "$BUILD_DIR"
+run0 meson install --no-rebuild -C "$BUILD_DIR"
 echo "Done."
